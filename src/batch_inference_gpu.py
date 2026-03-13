@@ -147,6 +147,15 @@ def run(
     )
 
 
+_JAVA_INCOMPATIBLE_MSG = """
+PySpark failed due to Java compatibility. Spark 3.5 supports Java 11/17 only, not Java 21/22+.
+
+Options:
+  1. Use Java 11 or 17: set JAVA_HOME and rerun this script
+  2. Run standalone inference (no Spark): python scripts/run_inference_local.py --input-path %s --output-path %s --text-col %s
+"""
+
+
 def main() -> None:
     args = _parse_args()
 
@@ -154,7 +163,15 @@ def main() -> None:
         arrow_max_records_per_batch=args.max_records_per_batch,
     )
     builder = SparkSessionBuilder(config=config)
-    spark = builder.build()
+
+    try:
+        spark = builder.build()
+    except TypeError as e:
+        if "JavaPackage" in str(e) and "not callable" in str(e):
+            inp = args.input_path or "<input-path>"
+            out = args.output_path or "<output-path>"
+            raise SystemExit(_JAVA_INCOMPATIBLE_MSG % (inp, out, args.text_col))
+        raise
 
     if args.generate_sample_data:
         base = args.output_path or "./data"
