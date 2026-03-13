@@ -26,14 +26,22 @@ from src.inference.udf import predict_sentiment_udf
 
 @pytest.fixture(scope="module")
 def spark():
-    return (
-        SparkSession.builder
-        .master("local[2]")
-        .appName("test-udf")
-        .config("spark.sql.execution.arrow.pyspark.enabled", "true")
-        .config("spark.sql.execution.arrow.maxRecordsPerBatch", "64")
-        .getOrCreate()
-    )
+    try:
+        return (
+            SparkSession.builder
+            .master("local[2]")
+            .appName("test-udf")
+            .config("spark.sql.execution.arrow.pyspark.enabled", "true")
+            .config("spark.sql.execution.arrow.maxRecordsPerBatch", "64")
+            .getOrCreate()
+        )
+    except TypeError as e:
+        if "JavaPackage" in str(e) and "not callable" in str(e):
+            pytest.skip(
+                "PySpark fails with Java 21/22. Use Java 11 or 17: "
+                "https://adoptium.net or set JAVA_HOME to a Java 11/17 installation."
+            )
+        raise
 
 
 def test_sentiment_udf_schema(spark):

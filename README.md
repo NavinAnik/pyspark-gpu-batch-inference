@@ -22,7 +22,7 @@ flowchart LR
 
 ## Quick Start (Local GPU)
 
-1. **Prerequisites**: NVIDIA GPU, `nvidia-smi`, **Python 3.8–3.12** (PySpark does not support 3.14+)
+1. **Prerequisites**: NVIDIA GPU, `nvidia-smi`, **Python 3.8–3.12**, **Java 11 or 17** (not 21/22)
 
    ```bash
    pip install -r requirements.txt
