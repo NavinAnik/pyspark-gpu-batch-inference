@@ -3,8 +3,15 @@ Local test for the sentiment UDF using CPU fallback (no GPU required).
 """
 
 import json
+import sys
 
 import pytest
+
+# PySpark/Py4J support Python 3.8-3.12. Python 3.14+ causes 'JavaPackage' object is not callable.
+pytestmark = pytest.mark.skipif(
+    sys.version_info >= (3, 14),
+    reason="PySpark requires Python 3.8-3.12. Use pyenv or a venv with Python 3.11/3.12.",
+)
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 

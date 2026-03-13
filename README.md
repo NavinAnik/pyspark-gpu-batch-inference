@@ -22,7 +22,7 @@ flowchart LR
 
 ## Quick Start (Local GPU)
 
-1. **Prerequisites**: NVIDIA GPU, `nvidia-smi`, Python 3.9+
+1. **Prerequisites**: NVIDIA GPU, `nvidia-smi`, **Python 3.8–3.12** (PySpark does not support 3.14+)
 
    ```bash
    pip install -r requirements.txt
@@ -66,4 +66,4 @@ See [article/ARTICLE_OUTLINE.md](article/ARTICLE_OUTLINE.md) for the full techni
 pytest tests/ -v
 ```
 
-Uses CPU fallback; no GPU required.
+Uses CPU fallback; no GPU required. Requires **Python 3.8–3.12** (PySpark/Py4J do not support 3.14+).
