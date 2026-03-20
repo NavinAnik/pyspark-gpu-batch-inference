@@ -1,6 +1,6 @@
-# Scaling ML Batch Inference: PySpark + CUDA GPUs
+# Scaling ML Batch Inference: PySpark + CUDA / MPS GPUs
 
-Reference implementation for GPU-accelerated batch inference using PySpark, Pandas UDFs (Arrow), and Hugging Face transformers. Processes Amazon Product Reviews in Parquet with a DistilBERT sentiment model across AWS EMR, Azure Databricks, GCP Dataproc, and local GPU.
+Reference implementation for GPU-accelerated batch inference using PySpark, Pandas UDFs (Arrow), and Hugging Face transformers. Processes Amazon Product Reviews in Parquet with a DistilBERT sentiment model across AWS EMR, Azure Databricks, GCP Dataproc, and local GPU (NVIDIA CUDA or Apple Silicon MPS).
 
 ## Architecture
 
@@ -13,7 +13,7 @@ flowchart LR
     e2["Executor 2"]
     eN["Executor N"]
   end
-  hf["HF Sentiment Pipeline (PyTorch + CUDA)"]
+  hf["HF Sentiment Pipeline (PyTorch + CUDA/MPS)"]
   output["Output Parquet"]
 
   dataLake --> driver --> executors
@@ -22,11 +22,11 @@ flowchart LR
 
 ## Quick Start (Local GPU)
 
-1. **Prerequisites**: NVIDIA GPU, `nvidia-smi`, **Python 3.8–3.12**, **Java 11 or 17** (not 21/22)
+1. **Prerequisites**: **Python 3.8–3.12**, **Java 11 or 17** (not 21/22). For GPU: NVIDIA GPU with `nvidia-smi` (CUDA) or Apple Silicon Mac (MPS).
 
    ```bash
    pip install -r requirements.txt
-   python -c "import torch; print('CUDA:', torch.cuda.is_available())"
+   python -c "import torch; print('CUDA:', torch.cuda.is_available(), 'MPS:', getattr(torch.backends, 'mps', None) and torch.backends.mps.is_available())"
    ```
 
 2. **Run with sample data** (no external dataset):
@@ -38,7 +38,7 @@ flowchart LR
 
    Output: `./data/sample_output/`
 
-3. **Run with your own Parquet**:
+3. **Run with your own Parquet** (use `--device mps` on Apple Silicon, `--device -1` for CPU):
 
    ```bash
    spark-submit src/batch_inference_gpu.py \

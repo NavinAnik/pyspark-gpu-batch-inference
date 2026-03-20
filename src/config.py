@@ -24,9 +24,9 @@ class SparkConfig:
     app_name: str = "pyspark-gpu-batch-inference"
     master: Optional[str] = None
 
-    # Arrow + Pandas UDF tuning
+    # Arrow + Pandas UDF tuning (1024 for 24GB RAM / M4 Pro)
     arrow_enabled: bool = True
-    arrow_max_records_per_batch: int = 512
+    arrow_max_records_per_batch: int = 1024
 
     # GPU resource configuration (one task per GPU by default)
     executor_gpu_amount: int = 1
@@ -95,6 +95,10 @@ class SparkSessionBuilder:
 
         # Encourage worker reuse so that model weights stay hot in memory.
         builder = builder.config("spark.python.worker.reuse", "true")
+
+        # Bind driver to localhost to prevent heartbeat failures on local mode
+        builder = builder.config("spark.driver.host", "127.0.0.1")
+        builder = builder.config("spark.driver.bindAddress", "127.0.0.1")
 
         # GPU resource discovery and allocation.
         builder = builder.config(
